@@ -142,12 +142,22 @@ namespace CSLab3.ViewModels
             
             if (_furnaces.Any())
             {
-                var random = new Random();
-                var furnace = _furnaces[random.Next(_furnaces.Count)];
-                furnace.AddMaterials(
-                    random.Next(10, 50),
-                    random.Next(10, 50),
-                    random.Next(5, 25));
+                var furnace = _furnaces[0];
+                if (loader != null)
+                {
+                    switch (loader.CurrentMaterial)
+                    {
+                        case "Железная руда":
+                            furnace.AddMaterials(loader.Quantity, 0, 0);
+                            break;
+                        case "Кокс":
+                            furnace.AddMaterials(0, loader.Quantity, 0);
+                            break;
+                        case "Известняк":
+                            furnace.AddMaterials(0, 0, loader.Quantity);
+                            break;
+                    }
+                }
             }
         }
         
@@ -159,7 +169,7 @@ namespace CSLab3.ViewModels
         
         public void LogMessage(string message)
         {
-            LogText += $"[{DateTime.Now:HH:mm:ss}] {message}\r\n";
+            LogText += $"\r\n[{DateTime.Now:HH:mm:ss}] {message}";
             OnPropertyChanged(nameof(LogText));
         }
         
@@ -245,14 +255,41 @@ namespace CSLab3.ViewModels
             var loader = sender as MaterialLoader;
             _viewModel.LogMessage($"[{loader?.Name}] Материалы успешно загружены");
             
+            // Load specific amounts to the first furnace
             if (_viewModel.Furnaces.Any())
             {
-                var random = new Random();
-                var furnace = _viewModel.Furnaces[random.Next(_viewModel.Furnaces.Count)];
-                furnace.AddMaterials(
-                    random.Next(10, 50),
-                    random.Next(10, 50),
-                    random.Next(5, 25));
+                var furnace = _viewModel.Furnaces[0];
+                // Load specific amounts based on what the loader was set to load
+                if (loader != null)
+                {
+                    switch (loader.CurrentMaterial)
+                    {
+                        case "Железная руда":
+                            furnace.AddMaterials(loader.Quantity, 0, 0);
+                            break;
+                        case "Кокс":
+                            furnace.AddMaterials(0, loader.Quantity, 0);
+                            break;
+                        case "Известняк":
+                            furnace.AddMaterials(0, 0, loader.Quantity);
+                            break;
+                        default:
+                            // Load balanced amounts if material type is unknown
+                            furnace.AddMaterials(
+                                loader.Quantity / 3,
+                                loader.Quantity / 3,
+                                loader.Quantity / 3);
+                            break;
+                    }
+                }
+                else
+                {
+                    // Fallback to random amounts if loader is null
+                    furnace.AddMaterials(
+                        20,
+                        20,
+                        10);
+                }
             }
         }
         
@@ -441,6 +478,16 @@ namespace CSLab3.ViewModels
                 {
                     loader.StopLoading();
                 }
+            }
+            
+            // Control animation timer based on simulation state
+            if (_isSimulationRunning)
+            {
+                _animationTimer.Start();
+            }
+            else
+            {
+                _animationTimer.Stop();
             }
             
             _startStopButton.Text = _isSimulationRunning ? "Остановить симуляцию" : "Запустить симуляцию";

@@ -65,8 +65,13 @@ namespace CSLab3.Models
                     
                     if (loader != null && !loader.IsLoading)
                     {
+                        // Set what to load before starting
+                        string[] materials = { "Железная руда", "Кокс", "Известняк" };
+                        string materialType = materials[_random.Next(materials.Length)];
+                        int quantity = _random.Next(10, 50);
+                        loader.LoadMaterial(materialType, quantity);
                         loader.StartLoading();
-                        OnStatusChanged($"{Name} запустил загрузчик {loader.Name}");
+                        OnStatusChanged($"{Name} запустил загрузчик {loader.Name} для загрузки {quantity} единиц {materialType}");
                     }
                     
                     int workDuration = Math.Max(1000, 3000 - (ExperienceLevel * 200));
