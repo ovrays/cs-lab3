@@ -189,8 +189,8 @@ namespace CSLab3.ViewModels
         private Button _addFurnaceButton;
         private Button _addWorkerButton;
         private Button _addLoaderButton;
-        private Timer _animationTimer;
-        private Timer _logUpdateTimer;
+        private System.Windows.Forms.Timer _animationTimer;
+        private System.Windows.Forms.Timer _logUpdateTimer;
         private Panel _animationPanel;
         
         public MainForm()
@@ -223,7 +223,7 @@ namespace CSLab3.ViewModels
             _animationPanel.Paint += AnimationPanel_Paint;
             this.Controls.Add(_animationPanel);
             
-            _logUpdateTimer = new Timer();
+            _logUpdateTimer = new System.Windows.Forms.Timer();
             _logUpdateTimer.Interval = 100;
             _logUpdateTimer.Tick += LogUpdateTimer_Tick;
             _logUpdateTimer.Start();
@@ -257,7 +257,7 @@ namespace CSLab3.ViewModels
             _addLoaderButton.Click += AddLoaderButton_Click;
             this.Controls.Add(_addLoaderButton);
             
-            _animationTimer = new Timer();
+            _animationTimer = new System.Windows.Forms.Timer();
             _animationTimer.Interval = 50;
             _animationTimer.Tick += AnimationTimer_Tick;
             _animationTimer.Start();
