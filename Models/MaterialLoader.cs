@@ -70,7 +70,7 @@ namespace CSLab3.Models
             {
                 OnLoadingStatusChanged($"{Name} загружает {_quantity} единиц {_currentMaterial}");
                 
-                int loadingTime = _random.Next(2000, 5000);
+                int loadingTime = _random.Next(3000, 8000);
                 await Task.Delay(loadingTime, cancellationToken);
                 
                 if (!cancellationToken.IsCancellationRequested)

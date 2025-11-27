@@ -74,7 +74,7 @@ namespace CSLab3.Models
                         OnStatusChanged($"{Name} запустил загрузчик {loader.Name} для загрузки {quantity} единиц {materialType}");
                     }
                     
-                    int workDuration = Math.Max(1000, 3000 - (ExperienceLevel * 200));
+                    int workDuration = Math.Max(2000, 5000 - (ExperienceLevel * 200));
                     await Task.Delay(workDuration, cancellationToken);
                 }
                 catch (OperationCanceledException)

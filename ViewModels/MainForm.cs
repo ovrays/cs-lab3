@@ -140,25 +140,75 @@ namespace CSLab3.ViewModels
             var loader = sender as MaterialLoader;
             LogMessage($"[{loader?.Name}] Материалы успешно загружены");
             
+            // Load specific amounts to the most appropriate furnace
             if (_furnaces.Any())
             {
-                var furnace = _furnaces[0];
-                if (loader != null)
+                // Find the furnace that needs this material the most
+                var targetFurnace = SelectAppropriateFurnace(loader);
+                
+                if (targetFurnace != null)
                 {
-                    switch (loader.CurrentMaterial)
+                    // Load specific amounts based on what the loader was set to load
+                    if (loader != null)
                     {
-                        case "Железная руда":
-                            furnace.AddMaterials(loader.Quantity, 0, 0);
-                            break;
-                        case "Кокс":
-                            furnace.AddMaterials(0, loader.Quantity, 0);
-                            break;
-                        case "Известняк":
-                            furnace.AddMaterials(0, 0, loader.Quantity);
-                            break;
+                        switch (loader.CurrentMaterial)
+                        {
+                            case "Железная руда":
+                                targetFurnace.AddMaterials(loader.Quantity, 0, 0);
+                                break;
+                            case "Кокс":
+                                targetFurnace.AddMaterials(0, loader.Quantity, 0);
+                                break;
+                            case "Известняк":
+                                targetFurnace.AddMaterials(0, 0, loader.Quantity);
+                                break;
+                            default:
+                                // Load balanced amounts if material type is unknown
+                                targetFurnace.AddMaterials(
+                                    loader.Quantity / 3,
+                                    loader.Quantity / 3,
+                                    loader.Quantity / 3);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Fallback to random amounts if loader is null
+                        targetFurnace.AddMaterials(
+                            20,
+                            20,
+                            10);
                     }
                 }
             }
+        }
+        
+        private BlastFurnace SelectAppropriateFurnace(MaterialLoader loader)
+        {
+            if (loader == null || !_furnaces.Any())
+                return null;
+            
+            // Find furnace with lowest level of the required material
+            BlastFurnace targetFurnace = null;
+            
+            switch (loader.CurrentMaterial)
+            {
+                case "Железная руда":
+                    targetFurnace = _furnaces.OrderBy(f => f.IronOre).FirstOrDefault();
+                    break;
+                case "Кокс":
+                    targetFurnace = _furnaces.OrderBy(f => f.Coke).FirstOrDefault();
+                    break;
+                case "Известняк":
+                    targetFurnace = _furnaces.OrderBy(f => f.Limestone).FirstOrDefault();
+                    break;
+                default:
+                    // If material type is unknown, use the first furnace
+                    targetFurnace = _furnaces.FirstOrDefault();
+                    break;
+            }
+            
+            return targetFurnace;
         }
         
         private void Loader_LoadingStatusChanged(object sender, string e)
@@ -255,42 +305,75 @@ namespace CSLab3.ViewModels
             var loader = sender as MaterialLoader;
             _viewModel.LogMessage($"[{loader?.Name}] Материалы успешно загружены");
             
-            // Load specific amounts to the first furnace
+            // Load specific amounts to the most appropriate furnace
             if (_viewModel.Furnaces.Any())
             {
-                var furnace = _viewModel.Furnaces[0];
-                // Load specific amounts based on what the loader was set to load
-                if (loader != null)
+                // Find the furnace that needs this material the most
+                var targetFurnace = SelectAppropriateFurnace(loader);
+                
+                if (targetFurnace != null)
                 {
-                    switch (loader.CurrentMaterial)
+                    // Load specific amounts based on what the loader was set to load
+                    if (loader != null)
                     {
-                        case "Железная руда":
-                            furnace.AddMaterials(loader.Quantity, 0, 0);
-                            break;
-                        case "Кокс":
-                            furnace.AddMaterials(0, loader.Quantity, 0);
-                            break;
-                        case "Известняк":
-                            furnace.AddMaterials(0, 0, loader.Quantity);
-                            break;
-                        default:
-                            // Load balanced amounts if material type is unknown
-                            furnace.AddMaterials(
-                                loader.Quantity / 3,
-                                loader.Quantity / 3,
-                                loader.Quantity / 3);
-                            break;
+                        switch (loader.CurrentMaterial)
+                        {
+                            case "Железная руда":
+                                targetFurnace.AddMaterials(loader.Quantity, 0, 0);
+                                break;
+                            case "Кокс":
+                                targetFurnace.AddMaterials(0, loader.Quantity, 0);
+                                break;
+                            case "Известняк":
+                                targetFurnace.AddMaterials(0, 0, loader.Quantity);
+                                break;
+                            default:
+                                // Load balanced amounts if material type is unknown
+                                targetFurnace.AddMaterials(
+                                    loader.Quantity / 3,
+                                    loader.Quantity / 3,
+                                    loader.Quantity / 3);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Fallback to random amounts if loader is null
+                        targetFurnace.AddMaterials(
+                            20,
+                            20,
+                            10);
                     }
                 }
-                else
-                {
-                    // Fallback to random amounts if loader is null
-                    furnace.AddMaterials(
-                        20,
-                        20,
-                        10);
-                }
             }
+        }
+        
+        private BlastFurnace SelectAppropriateFurnace(MaterialLoader loader)
+        {
+            if (loader == null || !_viewModel.Furnaces.Any())
+                return null;
+            
+            // Find furnace with lowest level of the required material
+            BlastFurnace targetFurnace = null;
+            
+            switch (loader.CurrentMaterial)
+            {
+                case "Железная руда":
+                    targetFurnace = _viewModel.Furnaces.OrderBy(f => f.IronOre).FirstOrDefault();
+                    break;
+                case "Кокс":
+                    targetFurnace = _viewModel.Furnaces.OrderBy(f => f.Coke).FirstOrDefault();
+                    break;
+                case "Известняк":
+                    targetFurnace = _viewModel.Furnaces.OrderBy(f => f.Limestone).FirstOrDefault();
+                    break;
+                default:
+                    // If material type is unknown, use the first furnace
+                    targetFurnace = _viewModel.Furnaces.FirstOrDefault();
+                    break;
+            }
+            
+            return targetFurnace;
         }
         
         private void Loader_LoadingStatusChanged(object sender, string e)

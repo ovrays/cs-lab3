@@ -124,7 +124,7 @@ namespace CSLab3.Models
 
                     CheckOverheat();
 
-                    await Task.Delay(1000, cancellationToken);
+                    await Task.Delay(2000, cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {
