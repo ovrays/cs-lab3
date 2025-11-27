@@ -94,7 +94,7 @@ namespace CSLab3.ViewModels
         private void Furnace_MaterialDepleted(object sender, EventArgs e)
         {
             var furnace = sender as BlastFurnace;
-            LogMessage($"ТРЕВОГА: {furnace?.Name} исчерпал материалы!");
+            LogMessage($"Внимание: {furnace?.Name} исчерпал материалы!");
             
             foreach (var worker in _workers)
             {
@@ -105,7 +105,7 @@ namespace CSLab3.ViewModels
         private void Furnace_Overheat(object sender, EventArgs e)
         {
             var furnace = sender as BlastFurnace;
-            LogMessage($"ТРЕВОГА: {furnace?.Name} перегревается!");
+            LogMessage($"Внимание: {furnace?.Name} перегревается!");
             
             foreach (var worker in _workers)
             {
@@ -192,6 +192,73 @@ namespace CSLab3.ViewModels
         private System.Windows.Forms.Timer _animationTimer;
         private System.Windows.Forms.Timer _logUpdateTimer;
         private Panel _animationPanel;
+        
+        // Event handlers for furnace
+        private void Furnace_MaterialDepleted(object sender, EventArgs e)
+        {
+            var furnace = sender as BlastFurnace;
+            _viewModel.LogMessage($"Внимание: {furnace?.Name} исчерпал материалы!");
+            
+            foreach (var worker in _viewModel.Workers)
+            {
+                worker.RespondToEvent("MaterialDepleted");
+            }
+        }
+        
+        private void Furnace_Overheat(object sender, EventArgs e)
+        {
+            var furnace = sender as BlastFurnace;
+            _viewModel.LogMessage($"Внимание: {furnace?.Name} перегревается!");
+            
+            foreach (var worker in _viewModel.Workers)
+            {
+                worker.RespondToEvent("Overheat");
+            }
+        }
+        
+        private void Furnace_StatusChanged(object sender, string e)
+        {
+            var furnace = sender as BlastFurnace;
+            _viewModel.LogMessage($"[{furnace?.Name}] {e}");
+        }
+        
+        private void Furnace_TemperatureChanged(object sender, int e)
+        {
+        }
+        
+        private void Worker_WorkPerformed(object sender, string e)
+        {
+            var worker = sender as Worker;
+            _viewModel.LogMessage($"[{worker?.Name}] Выполняет: {e}");
+        }
+        
+        private void Worker_StatusChanged(object sender, string e)
+        {
+            var worker = sender as Worker;
+            _viewModel.LogMessage($"[{worker?.Name}] {e}");
+        }
+        
+        private void Loader_MaterialLoaded(object sender, EventArgs e)
+        {
+            var loader = sender as MaterialLoader;
+            _viewModel.LogMessage($"[{loader?.Name}] Материалы успешно загружены");
+            
+            if (_viewModel.Furnaces.Any())
+            {
+                var random = new Random();
+                var furnace = _viewModel.Furnaces[random.Next(_viewModel.Furnaces.Count)];
+                furnace.AddMaterials(
+                    random.Next(10, 50),
+                    random.Next(10, 50),
+                    random.Next(5, 25));
+            }
+        }
+        
+        private void Loader_LoadingStatusChanged(object sender, string e)
+        {
+            var loader = sender as MaterialLoader;
+            _viewModel.LogMessage($"[{loader?.Name}] {e}");
+        }
         
         public MainForm()
         {
@@ -298,7 +365,7 @@ namespace CSLab3.ViewModels
             worker.WorkPerformed += Worker_WorkPerformed;
             worker.StatusChanged += Worker_StatusChanged;
             _viewModel.Workers.Add(worker);
-            worker.StartWork(null);
+            worker.StartWork(_viewModel.Loaders.Count > 0 ? _viewModel.Loaders[0] : null);
             _viewModel.LogMessage($"Добавлен новый рабочий: {worker.Name}");
         }
         
