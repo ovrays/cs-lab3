@@ -1,9 +1,4 @@
-using System;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using CSLab3.Models;
-using CSLab3.Interfaces;
 
 namespace CSLab3.ViewModels
 {
@@ -15,12 +10,11 @@ namespace CSLab3.ViewModels
         private Button _addWorkerButton;
         private Button _addLoaderButton;
         private Button _startStopButton;
-        private bool _isSimulationRunning = false;
+        private bool _isSimulationRunning = true;
         private System.Windows.Forms.Timer _animationTimer;
         private System.Windows.Forms.Timer _logUpdateTimer;
         private Panel _animationPanel;
         
-        // Event handlers for furnace
         private void Furnace_MaterialDepleted(object sender, EventArgs e)
         {
             _viewModel.Furnace_MaterialDepleted(sender, e);
@@ -102,6 +96,7 @@ namespace CSLab3.ViewModels
             _logTextBox.Multiline = true;
             _logTextBox.ScrollBars = ScrollBars.Vertical;
             _logTextBox.ReadOnly = true;
+
             this.Controls.Add(_logTextBox);
             
             _addFurnaceButton = new Button();
@@ -128,15 +123,15 @@ namespace CSLab3.ViewModels
             _startStopButton = new Button();
             _startStopButton.Location = new System.Drawing.Point(620, 130);
             _startStopButton.Size = new System.Drawing.Size(150, 30);
-            _startStopButton.Text = "Запустить симуляцию";
+            _startStopButton.Text = "Остановить симуляцию";
             _startStopButton.Click += StartStopButton_Click;
             this.Controls.Add(_startStopButton);
             
             _animationTimer = new System.Windows.Forms.Timer();
             _animationTimer.Interval = 50;
             _animationTimer.Tick += AnimationTimer_Tick;
-            _animationTimer.Stop(); // Start with animation stopped
-            
+            _animationTimer.Start(); 
+
             BindToViewModel();
         }
         
@@ -149,8 +144,7 @@ namespace CSLab3.ViewModels
         {
             _logTextBox.Text = _viewModel.LogText;
             
-            // Only auto-scroll to bottom when simulation is running
-            if (_isSimulationRunning)
+            if (_isSimulationRunning) 
             {
                 _logTextBox.SelectionStart = _logTextBox.Text.Length;
                 _logTextBox.ScrollToCaret();
@@ -196,12 +190,10 @@ namespace CSLab3.ViewModels
         {
             _isSimulationRunning = !_isSimulationRunning;
             
-            // Toggle all furnaces
             foreach (var furnace in _viewModel.Furnaces)
             {
                 if (_isSimulationRunning)
                 {
-                    // Only start if not already running
                     if (!furnace.IsRunning)
                     {
                         furnace.Start();
@@ -213,12 +205,10 @@ namespace CSLab3.ViewModels
                 }
             }
             
-            // Toggle all workers
             foreach (var worker in _viewModel.Workers)
             {
                 if (_isSimulationRunning)
                 {
-                    // Only start if not already working
                     if (!worker.IsWorking)
                     {
                         worker.StartWork(_viewModel.Loaders.Count > 0 ? _viewModel.Loaders[0] : null);
@@ -230,12 +220,10 @@ namespace CSLab3.ViewModels
                 }
             }
             
-            // Toggle all loaders
             foreach (var loader in _viewModel.Loaders)
             {
                 if (_isSimulationRunning)
                 {
-                    // Only start if not already loading
                     if (!loader.IsLoading)
                     {
                         loader.StartLoading();
@@ -247,7 +235,6 @@ namespace CSLab3.ViewModels
                 }
             }
             
-            // Control animation timer based on simulation state
             if (_isSimulationRunning)
             {
                 _animationTimer.Start();
@@ -290,7 +277,7 @@ namespace CSLab3.ViewModels
             {
                 var furnace = _viewModel.Furnaces[i];
                 var x = 50 + (i % 3) * 150;
-                var y = 50 + (i / 3) * 100;
+                var y = 100 + (i / 3) * 100;
                 var width = 100;
                 var height = 80;
                 

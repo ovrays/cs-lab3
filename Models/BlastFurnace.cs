@@ -1,8 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CSLab3.Interfaces;
-
 namespace CSLab3.Models
 {
     public class BlastFurnace

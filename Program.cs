@@ -1,5 +1,3 @@
-using System;
-using System.Windows.Forms;
 using CSLab3.ViewModels;
 
 namespace CSLab3

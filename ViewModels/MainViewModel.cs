@@ -1,9 +1,5 @@
-using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
 using CSLab3.Models;
-using CSLab3.Interfaces;
 
 namespace CSLab3.ViewModels
 {

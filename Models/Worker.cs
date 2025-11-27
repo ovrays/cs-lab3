@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using CSLab3.Interfaces;
 
 namespace CSLab3.Models
@@ -65,7 +62,6 @@ namespace CSLab3.Models
                     
                     if (loader != null && !loader.IsLoading)
                     {
-                        // Set what to load before starting
                         string[] materials = { "Железная руда", "Кокс", "Известняк" };
                         string materialType = materials[_random.Next(materials.Length)];
                         int quantity = _random.Next(10, 50);
