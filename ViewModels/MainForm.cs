@@ -159,7 +159,7 @@ namespace CSLab3.ViewModels
         
         public void LogMessage(string message)
         {
-            LogText += $"[{DateTime.Now:HH:mm:ss}] {message}\n";
+            LogText += $"[{DateTime.Now:HH:mm:ss}] {message}\r\n";
             OnPropertyChanged(nameof(LogText));
         }
         
@@ -189,6 +189,8 @@ namespace CSLab3.ViewModels
         private Button _addFurnaceButton;
         private Button _addWorkerButton;
         private Button _addLoaderButton;
+        private Button _startStopButton;
+        private bool _isSimulationRunning = true;
         private System.Windows.Forms.Timer _animationTimer;
         private System.Windows.Forms.Timer _logUpdateTimer;
         private Panel _animationPanel;
@@ -274,7 +276,7 @@ namespace CSLab3.ViewModels
             
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1000, 700);
+            this.ClientSize = new System.Drawing.Size(1000, 800);
             this.Text = "Симуляция доменной печи";
             this.Name = "MainForm";
             
@@ -297,7 +299,7 @@ namespace CSLab3.ViewModels
             
             _logTextBox = new TextBox();
             _logTextBox.Location = new System.Drawing.Point(10, 420);
-            _logTextBox.Size = new System.Drawing.Size(980, 200);
+            _logTextBox.Size = new System.Drawing.Size(980, 300);
             _logTextBox.Multiline = true;
             _logTextBox.ScrollBars = ScrollBars.Vertical;
             _logTextBox.ReadOnly = true;
@@ -323,6 +325,13 @@ namespace CSLab3.ViewModels
             _addLoaderButton.Text = "Добавить загрузчик";
             _addLoaderButton.Click += AddLoaderButton_Click;
             this.Controls.Add(_addLoaderButton);
+            
+            _startStopButton = new Button();
+            _startStopButton.Location = new System.Drawing.Point(620, 130);
+            _startStopButton.Size = new System.Drawing.Size(150, 30);
+            _startStopButton.Text = "Остановить симуляцию";
+            _startStopButton.Click += StartStopButton_Click;
+            this.Controls.Add(_startStopButton);
             
             _animationTimer = new System.Windows.Forms.Timer();
             _animationTimer.Interval = 50;
@@ -377,6 +386,65 @@ namespace CSLab3.ViewModels
             loader.LoadingStatusChanged += Loader_LoadingStatusChanged;
             _viewModel.Loaders.Add(loader);
             _viewModel.LogMessage($"Добавлен новый загрузчик: {loader.Name}");
+        }
+        
+        private void StartStopButton_Click(object sender, EventArgs e)
+        {
+            _isSimulationRunning = !_isSimulationRunning;
+            
+            // Toggle all furnaces
+            foreach (var furnace in _viewModel.Furnaces)
+            {
+                if (_isSimulationRunning)
+                {
+                    // Only start if not already running
+                    if (!furnace.IsRunning)
+                    {
+                        furnace.Start();
+                    }
+                }
+                else
+                {
+                    furnace.Stop();
+                }
+            }
+            
+            // Toggle all workers
+            foreach (var worker in _viewModel.Workers)
+            {
+                if (_isSimulationRunning)
+                {
+                    // Only start if not already working
+                    if (!worker.IsWorking)
+                    {
+                        worker.StartWork(_viewModel.Loaders.Count > 0 ? _viewModel.Loaders[0] : null);
+                    }
+                }
+                else
+                {
+                    worker.StopWork();
+                }
+            }
+            
+            // Toggle all loaders
+            foreach (var loader in _viewModel.Loaders)
+            {
+                if (_isSimulationRunning)
+                {
+                    // Only start if not already loading
+                    if (!loader.IsLoading)
+                    {
+                        loader.StartLoading();
+                    }
+                }
+                else
+                {
+                    loader.StopLoading();
+                }
+            }
+            
+            _startStopButton.Text = _isSimulationRunning ? "Остановить симуляцию" : "Запустить симуляцию";
+            _viewModel.LogMessage(_isSimulationRunning ? "Симуляция запущена" : "Симуляция остановлена");
         }
         
         private void LogUpdateTimer_Tick(object sender, EventArgs e)
