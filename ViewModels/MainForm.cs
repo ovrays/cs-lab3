@@ -94,7 +94,7 @@ namespace CSLab3.ViewModels
         private void Furnace_MaterialDepleted(object sender, EventArgs e)
         {
             var furnace = sender as BlastFurnace;
-            LogMessage($"Внимание: {furnace?.Name} исчерпал материалы!");
+            LogMessage($"ТРЕВОГА: {furnace?.Name} исчерпал материалы!");
             
             foreach (var worker in _workers)
             {
@@ -105,7 +105,7 @@ namespace CSLab3.ViewModels
         private void Furnace_Overheat(object sender, EventArgs e)
         {
             var furnace = sender as BlastFurnace;
-            LogMessage($"Внимание: {furnace?.Name} перегревается!");
+            LogMessage($"ТРЕВОГА: {furnace?.Name} перегревается!");
             
             foreach (var worker in _workers)
             {
@@ -157,7 +157,7 @@ namespace CSLab3.ViewModels
             LogMessage($"[{loader?.Name}] {e}");
         }
         
-        private void LogMessage(string message)
+        public void LogMessage(string message)
         {
             LogText += $"[{DateTime.Now:HH:mm:ss}] {message}\n";
             OnPropertyChanged(nameof(LogText));
@@ -281,10 +281,10 @@ namespace CSLab3.ViewModels
         {
             var furnaceNumber = _viewModel.Furnaces.Count + 1;
             var furnace = new BlastFurnace($"Печь #{furnaceNumber}");
-            furnace.MaterialDepleted += _viewModel.Furnaces[0].MaterialDepleted;
-            furnace.Overheat += _viewModel.Furnaces[0].Overheat;
-            furnace.StatusChanged += _viewModel.Furnaces[0].StatusChanged;
-            furnace.TemperatureChanged += _viewModel.Furnaces[0].TemperatureChanged;
+            furnace.MaterialDepleted += Furnace_MaterialDepleted;
+            furnace.Overheat += Furnace_Overheat;
+            furnace.StatusChanged += Furnace_StatusChanged;
+            furnace.TemperatureChanged += Furnace_TemperatureChanged;
             _viewModel.Furnaces.Add(furnace);
             furnace.Start();
             _viewModel.LogMessage($"Добавлена новая печь: {furnace.Name}");
@@ -295,8 +295,8 @@ namespace CSLab3.ViewModels
             var workerNumber = _viewModel.Workers.Count + 1;
             var random = new Random();
             var worker = new Worker($"Рабочий #{workerNumber}", random.Next(1, 10));
-            worker.WorkPerformed += _viewModel.Workers[0].WorkPerformed;
-            worker.StatusChanged += _viewModel.Workers[0].StatusChanged;
+            worker.WorkPerformed += Worker_WorkPerformed;
+            worker.StatusChanged += Worker_StatusChanged;
             _viewModel.Workers.Add(worker);
             worker.StartWork(null);
             _viewModel.LogMessage($"Добавлен новый рабочий: {worker.Name}");
@@ -306,8 +306,8 @@ namespace CSLab3.ViewModels
         {
             var loaderNumber = _viewModel.Loaders.Count + 1;
             var loader = new MaterialLoader($"Загрузчик #{loaderNumber}");
-            loader.MaterialLoaded += _viewModel.Loaders[0].MaterialLoaded;
-            loader.LoadingStatusChanged += _viewModel.Loaders[0].LoadingStatusChanged;
+            loader.MaterialLoaded += Loader_MaterialLoaded;
+            loader.LoadingStatusChanged += Loader_LoadingStatusChanged;
             _viewModel.Loaders.Add(loader);
             _viewModel.LogMessage($"Добавлен новый загрузчик: {loader.Name}");
         }
