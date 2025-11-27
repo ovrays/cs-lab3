@@ -132,15 +132,12 @@ namespace CSLab3.ViewModels
             var loader = sender as MaterialLoader;
             LogMessage($"[{loader?.Name}] Материалы успешно загружены");
             
-            // Load specific amounts to the most appropriate furnace
             if (_furnaces.Any())
             {
-                // Find the furnace that needs this material the most
                 var targetFurnace = SelectAppropriateFurnace(loader);
                 
                 if (targetFurnace != null)
                 {
-                    // Load specific amounts based on what the loader was set to load
                     if (loader != null)
                     {
                         switch (loader.CurrentMaterial)
@@ -154,22 +151,7 @@ namespace CSLab3.ViewModels
                             case "Известняк":
                                 targetFurnace.AddMaterials(0, 0, loader.Quantity);
                                 break;
-                            default:
-                                // Load balanced amounts if material type is unknown
-                                targetFurnace.AddMaterials(
-                                    loader.Quantity / 3,
-                                    loader.Quantity / 3,
-                                    loader.Quantity / 3);
-                                break;
                         }
-                    }
-                    else
-                    {
-                        // Fallback to random amounts if loader is null
-                        targetFurnace.AddMaterials(
-                            20,
-                            20,
-                            10);
                     }
                 }
             }
@@ -180,7 +162,6 @@ namespace CSLab3.ViewModels
             if (loader == null || !_furnaces.Any())
                 return null;
             
-            // Find furnace with lowest level of the required material
             BlastFurnace targetFurnace = null;
             
             switch (loader.CurrentMaterial)
@@ -193,10 +174,6 @@ namespace CSLab3.ViewModels
                     break;
                 case "Известняк":
                     targetFurnace = _furnaces.OrderBy(f => f.Limestone).FirstOrDefault();
-                    break;
-                default:
-                    // If material type is unknown, use the first furnace
-                    targetFurnace = _furnaces.FirstOrDefault();
                     break;
             }
             
